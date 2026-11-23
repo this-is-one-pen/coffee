@@ -68,6 +68,27 @@ h2 { font-size: 1.2rem; margin: 0 0 16px; }
 .btn.correct { background: var(--ok-bg); border-color: var(--ok); }
 .btn.wrong { background: var(--ng-bg); border-color: var(--ng); }
 
+.cat-panel { margin-bottom: 16px; }
+.cat-img-box { border-radius: 12px; overflow: hidden; background: #f3f4f6; }
+.cat-img { display: block; width: 100%; height: auto; }
+.cat-placeholder {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.cat-emoji { font-size: 3rem; }
+.cat-caption { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); text-align: center; }
+.grow-banner {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  font-weight: bold;
+  text-align: center;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 8px;
+}
+
 .link {
   margin: 0 0 12px;
   padding: 0;

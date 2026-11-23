@@ -86,6 +86,45 @@ function showMenu() {
   );
 }
 
+// ---- 白猫の成長 ----
+function stageIndexFor(score) {
+  let idx = 0;
+  GROWTH_STAGES.forEach((s, i) => {
+    if (score >= s.min) idx = i;
+  });
+  return idx;
+}
+
+// 現在の正解数に応じた、猫の画像と一言を表示するパネル。grew=true なら成長を知らせる。
+function buildCatPanel(score, grew) {
+  const idx = stageIndexFor(score);
+  const stage = GROWTH_STAGES[idx];
+  const next = GROWTH_STAGES[idx + 1];
+
+  const holder = el("div", { class: "cat-img-box" });
+  const placeholder = () =>
+    el("div", { class: "cat-placeholder" }, [
+      el("div", { class: "cat-emoji", text: "🐱" }),
+      el("div", { text: `画像準備中(${stage.image})` })
+    ]);
+  const img = el("img", { class: "cat-img", src: stage.image, alt: `白猫:${stage.name}` });
+  img.addEventListener("error", () => holder.replaceChildren(placeholder()));
+  holder.append(img);
+
+  const caption = next
+    ? `あと${next.min - score}問正解で「${next.name}」に成長`
+    : "最終形態です!";
+  const children = [];
+  if (grew) {
+    children.push(el("div", { class: "grow-banner", text: `🎉 成長しました!「${stage.name}」` }));
+  }
+  children.push(holder);
+  children.push(
+    el("p", { class: "cat-caption", text: `${stage.name} ・ 正解 ${score}問 ・ ${caption}` })
+  );
+  return el("div", { class: "cat-panel" }, children);
+}
+
 // ---- 画面: 出題 ----
 function startQuiz(category) {
   const questions = shuffle(category.questions).map((q) => {
@@ -107,14 +146,20 @@ function showQuestion(state) {
     el("div", { style: `width:${(index / questions.length) * 100}%` })
   ]);
   const feedbackBox = el("div");
+  const catBox = el("div");
+  catBox.append(buildCatPanel(state.score, false));
   const choiceButtons = q.choices.map((text, i) =>
     el("button", { class: "btn", text, onclick: () => answer(i) })
   );
 
   function answer(chosen) {
     const correct = chosen === q.answer;
+    const before = stageIndexFor(state.score);
     if (correct) state.score++;
     else state.wrong.push({ q, chosen });
+    if (correct) {
+      catBox.replaceChildren(buildCatPanel(state.score, stageIndexFor(state.score) > before));
+    }
 
     choiceButtons.forEach((b, i) => {
       b.disabled = true;
@@ -145,6 +190,7 @@ function showQuestion(state) {
     el("div", { class: "card" }, [
       el("button", { class: "link", text: "← やめてメニューに戻る", onclick: showMenu }),
       progress,
+      catBox,
       el("p", {
         class: "muted",
         text: `${state.category.name} ・ ${index + 1} / ${questions.length}`
@@ -163,7 +209,8 @@ function showResult(state) {
 
   const children = [
     el("h1", { text: "結果" }),
-    el("div", { class: "score", text: `${state.score} / ${total}` })
+    el("div", { class: "score", text: `${state.score} / ${total}` }),
+    buildCatPanel(state.score, false)
   ];
 
   if (state.wrong.length > 0) {
