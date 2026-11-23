@@ -54,11 +54,17 @@ function render(node) {
 // ---- 画面: カテゴリ選択 ----
 function showMenu() {
   const best = loadBest();
-  const buttons = CATEGORIES.map((cat) => {
+  const buttons = [];
+  let lastGroup = null;
+  CATEGORIES.forEach((cat) => {
+    if (cat.group && cat.group !== lastGroup) {
+      buttons.push(el("h2", { class: "group-title", text: cat.group }));
+      lastGroup = cat.group;
+    }
     const record = best[cat.name];
     const base = `${cat.name}(${cat.questions.length}問)`;
     const label = record ? `${base} ベスト ${record.score}/${record.total}` : base;
-    return el("button", { class: "btn", text: label, onclick: () => startQuiz(cat) });
+    buttons.push(el("button", { class: "btn", text: label, onclick: () => startQuiz(cat) }));
   });
   const allQuestions = CATEGORIES.flatMap((c) => c.questions);
   const mockSize = Math.min(MOCK_TEST_SIZE, allQuestions.length);

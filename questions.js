@@ -16,13 +16,16 @@ function toQuestions(rows) {
 }
 
 const CATEGORIES = [
-  { name: "歴史・文化", questions: toQuestions(QDATA_HISTORY) },
-  { name: "栽培・品種", questions: toQuestions(QDATA_CULTIVATION) },
-  { name: "精製・生豆", questions: toQuestions(QDATA_PROCESSING) },
-  { name: "焙煎", questions: toQuestions(QDATA_ROASTING) },
-  { name: "抽出", questions: toQuestions(QDATA_BREWING) },
-  { name: "成分・品質", questions: toQuestions(QDATA_QUALITY) }
+  { group: "1級編", name: "歴史・文化", questions: toQuestions(QDATA_HISTORY) },
+  { group: "1級編", name: "栽培・品種", questions: toQuestions(QDATA_CULTIVATION) },
+  { group: "1級編", name: "精製・生豆", questions: toQuestions(QDATA_PROCESSING) },
+  { group: "1級編", name: "焙煎", questions: toQuestions(QDATA_ROASTING) },
+  { group: "1級編", name: "抽出", questions: toQuestions(QDATA_BREWING) },
+  { group: "1級編", name: "成分・品質", questions: toQuestions(QDATA_QUALITY) },
+  { group: "マスター編", name: "商品設計", questions: toQuestions(QDATA_PRODUCT) },
+  { group: "マスター編", name: "生豆鑑定", questions: toQuestions(QDATA_GREENBEAN) },
+  { group: "マスター編", name: "品質管理", questions: toQuestions(QDATA_QC) }
 ];
 
-// 全カテゴリからランダムに出題する「模擬テスト」の問題数
+// 全カテゴリ(1級編+マスター編)からランダムに出題する「模擬テスト」の問題数
 const MOCK_TEST_SIZE = 100;
