@@ -56,9 +56,8 @@ function showMenu() {
   const best = loadBest();
   const buttons = CATEGORIES.map((cat) => {
     const record = best[cat.name];
-    const label = record
-      ? `${cat.name}(ベスト ${record.score}/${record.total})`
-      : cat.name;
+    const base = `${cat.name}(${cat.questions.length}問)`;
+    const label = record ? `${base} ベスト ${record.score}/${record.total}` : base;
     return el("button", { class: "btn", text: label, onclick: () => startQuiz(cat) });
   });
   const allQuestions = CATEGORIES.flatMap((c) => c.questions);
@@ -144,6 +143,7 @@ function showQuestion(state) {
 
   render(
     el("div", { class: "card" }, [
+      el("button", { class: "link", text: "← やめてメニューに戻る", onclick: showMenu }),
       progress,
       el("p", {
         class: "muted",
