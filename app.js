@@ -92,6 +92,61 @@ function showMenu() {
   );
 }
 
+// ---- 世界地図(地図問題) ----
+const SVG_NS = "http://www.w3.org/2000/svg";
+const mapBoxCache = {};
+
+// 指定した国のパスから、表示すべき範囲(バウンディングボックス)を求める
+function countryBox(name) {
+  if (mapBoxCache[name]) return mapBoxCache[name];
+  const d = WORLD_MAP.countries[name];
+  let box = null;
+  for (const sub of d.split("M").slice(1)) {
+    const nums = sub.replace("Z", "").split("L").map((p) => p.split(" ").map(Number));
+    const xs = nums.map((p) => p[0]);
+    const ys = nums.map((p) => p[1]);
+    const b = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+    if (b.x1 <= 0 || b.x0 >= WORLD_MAP.width) continue; // 画面の外にある複製は除く
+    box = box
+      ? { x0: Math.min(box.x0, b.x0), x1: Math.max(box.x1, b.x1), y0: Math.min(box.y0, b.y0), y1: Math.max(box.y1, b.y1) }
+      : b;
+  }
+  mapBoxCache[name] = box;
+  return box;
+}
+
+// 対象の国に色を付け、その国の周辺を拡大した世界地図を作る
+function buildMap(name) {
+  const W = WORLD_MAP.width;
+  const H = WORLD_MAP.height;
+  const box = countryBox(name);
+  const cx = (box.x0 + box.x1) / 2;
+  const cy = (box.y0 + box.y1) / 2;
+  const w = Math.min(W, Math.max((box.x1 - box.x0) * 2.2, ((box.y1 - box.y0) * 2.2 * W) / H, 240));
+  const h = (w * H) / W;
+  const x0 = Math.max(0, Math.min(W - w, cx - w / 2));
+  const y0 = Math.max(0, Math.min(H - h, cy - h / 2));
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `${x0.toFixed(1)} ${y0.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);
+  svg.setAttribute("class", "world-map");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "世界地図。問題の国に色が付いています。");
+  const bg = document.createElementNS(SVG_NS, "rect");
+  bg.setAttribute("x", "0");
+  bg.setAttribute("y", "0");
+  bg.setAttribute("width", String(W));
+  bg.setAttribute("height", String(H));
+  bg.setAttribute("class", "map-sea");
+  svg.append(bg);
+  for (const [country, d] of Object.entries(WORLD_MAP.countries)) {
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("class", country === name ? "map-land map-target" : "map-land");
+    svg.append(path);
+  }
+  return el("div", { class: "map-box" }, [svg]);
+}
+
 // ---- 白猫の成長 ----
 function stageIndexFor(score) {
   let idx = 0;
@@ -202,6 +257,7 @@ function showQuestion(state) {
         text: `${state.category.name} ・ ${index + 1} / ${questions.length}`
       }),
       el("h2", { text: q.question }),
+      ...(q.map ? [buildMap(q.map)] : []),
       ...choiceButtons,
       feedbackBox
     ])

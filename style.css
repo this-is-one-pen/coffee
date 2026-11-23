@@ -146,3 +146,8 @@ h2 { font-size: 1.2rem; margin: 0 0 16px; }
 .review li { margin-bottom: 12px; }
 
 .group-title { font-size: 0.95rem; margin: 18px 0 8px; color: var(--primary-dark); border-left: 4px solid var(--primary); padding-left: 8px; }
+.map-box { margin: 8px 0 14px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border, #d6dbe3); }
+.world-map { display: block; width: 100%; height: auto; }
+.map-sea { fill: #dbeaf6; }
+.map-land { fill: #ece3cc; stroke: #a89a78; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
+.map-target { fill: #e8832a; stroke: #8a4a10; stroke-width: 1; }
