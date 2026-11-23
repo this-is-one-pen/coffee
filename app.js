@@ -61,22 +61,28 @@ function showMenu() {
       : cat.name;
     return el("button", { class: "btn", text: label, onclick: () => startQuiz(cat) });
   });
-  const all = el("button", {
-    class: "btn",
-    text: "すべてのカテゴリからランダム",
+  const allQuestions = CATEGORIES.flatMap((c) => c.questions);
+  const mockSize = Math.min(MOCK_TEST_SIZE, allQuestions.length);
+  const mock = el("button", {
+    class: "btn primary",
+    text: `模擬テスト(全カテゴリからランダム${mockSize}問)`,
     onclick: () =>
       startQuiz({
-        name: "ランダム",
-        questions: CATEGORIES.flatMap((c) => c.questions)
+        name: "模擬テスト",
+        questions: shuffle(allQuestions).slice(0, mockSize)
       })
   });
 
   render(
     el("div", { class: "card" }, [
-      el("h1", { text: "学習クイズ" }),
-      el("p", { class: "muted", text: "カテゴリを選んでスタート!" }),
+      el("h1", { text: QUIZ_TITLE }),
+      el("p", { class: "muted", text: "カテゴリを選んでスタート。1問ごとに正解・不正解が表示されます。" }),
       ...buttons,
-      all
+      mock,
+      el("p", {
+        class: "notice",
+        text: "この問題は、一般的なコーヒーの知識から作ったオリジナルの練習問題です。実際の試験問題ではありません。教本や講習会の内容を優先してください。"
+      })
     ])
   );
 }
@@ -118,11 +124,15 @@ function showQuestion(state) {
     });
 
     const isLast = index === questions.length - 1;
+    const feedbackChildren = [
+      el("div", { class: "verdict", text: correct ? "⭕ 正解!" : "❌ 不正解" })
+    ];
+    if (!correct) {
+      feedbackChildren.push(el("p", { text: `正解は「${q.choices[q.answer]}」です。` }));
+    }
+    feedbackChildren.push(el("p", { class: "explain", text: q.explanation }));
     feedbackBox.replaceChildren(
-      el("div", { class: `feedback ${correct ? "ok" : "ng"}` }, [
-        el("strong", { text: correct ? "正解!" : "不正解…" }),
-        el("p", { text: q.explanation })
-      ]),
+      el("div", { class: `feedback ${correct ? "ok" : "ng"}`, role: "status" }, feedbackChildren),
       el("button", {
         class: "btn primary",
         text: isLast ? "結果を見る" : "次の問題へ",
