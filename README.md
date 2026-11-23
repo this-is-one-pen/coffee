@@ -34,3 +34,16 @@
 
 - 開発中はプライベートリポジトリで作業します。
 - 公開するときは、パブリックリポジトリに完成版を置き、GitHub Pagesで公開します。
+
+## リポジトリの使い分け
+
+- **作業用(非公開)**: `this-is-one-pen/test` … 開発はここで行う(`origin`)。
+- **公開用(Public)**: `this-is-one-pen/coffee` … 公開したい状態になったときだけ反映する(`coffee`)。公開ページは GitHub Pages(https://this-is-one-pen.github.io/coffee/)。
+
+公開するときは、作業用で動作確認をしてから、次のコマンドで公開用へ反映します。
+
+```
+git push coffee main
+```
+
+反映の1〜2分後に、公開ページが更新されます。
